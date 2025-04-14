@@ -9,6 +9,12 @@ const connectDatabse = require("./database/connection");
 //connecting to db
 connectDatabse();
 
+app.get("/", (req, res) => {
+  res.json({
+    message: "Welcome to the backend of noteswap",
+  });
+});
+
 const server = app.listen(process.env.PORT, () => {
   console.log(`Server is on port ${process.env.PORT} `);
 });
