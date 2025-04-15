@@ -16,11 +16,19 @@ const studentSchema = new mongoose.Schema(
     },
     department: {
       type: String,
-      requied: true,
+      required: true,
     },
     username: {
       type: String,
       required: true,
+    },
+    noOfUploads: {
+      type: Number,
+      default: 0,
+    },
+    noOfDownloads: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }
