@@ -25,6 +25,14 @@ const noteSchema = new mongoose.Schema({
     ref: "Student",
     required: true,
   },
+  upvotes: {
+    type: Number,
+    default: 0,
+  },
+  downvotes: {
+    type: Number,
+    default: 0,
+  },
 });
 
 module.exports = mongoose.model("Notes", noteSchema);
