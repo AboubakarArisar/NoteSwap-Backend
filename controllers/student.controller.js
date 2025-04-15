@@ -21,7 +21,7 @@ const signup = catchAsyncError(async (req, res, next) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    const existingStudent = studentSchema.findOne({ username: username });
+    const existingStudent = await studentSchema.findOne({ username: username });
     if (existingStudent) {
       res.status(401).json({
         success: false,
@@ -31,11 +31,10 @@ const signup = catchAsyncError(async (req, res, next) => {
       return existingStudent;
     }
 
-    const studentCreated = await PersonSchema.create({
+    const studentCreated = await studentSchema.create({
       email,
-      hashedPassword,
+      password: hashedPassword,
       username,
-      password,
       department,
     });
 
@@ -56,16 +55,18 @@ const signup = catchAsyncError(async (req, res, next) => {
 const login = catchAsyncError(async (req, res) => {
   const { email, password } = req.body;
 
-  const student = studentSchema.find({ email: email });
+  // console.log("password : ", password);
+  const student = await studentSchema.findOne({ email });
   if (!student) {
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       message: "Student not found",
     });
-    return;
   }
 
-  const isMatch = bcrypt.compare(password, student.password);
+  // console.log("user password : ", student.password);
+  const isMatch = await bcrypt.compare(password, student.password);
+
   if (isMatch) {
     const jwtToken = jwt.sign(
       {
@@ -77,7 +78,12 @@ const login = catchAsyncError(async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-    return jwtToken;
+
+    return res.status(200).json({
+      success: true,
+      token: jwtToken,
+      student,
+    });
   } else {
     res.status(404).json({
       success: false,
@@ -86,8 +92,20 @@ const login = catchAsyncError(async (req, res) => {
   }
 });
 
+const getLeaderboard = catchAsyncError(async (req, res) => {
+  const topStudents = await studentSchema
+    .find({}, "username points department")
+    .sort({ points: -1 });
+
+  res.status(200).json({
+    success: true,
+    data: topStudents,
+  });
+});
+
 module.exports = {
   signup,
   login,
   getAllStudents,
+  getLeaderboard,
 };
