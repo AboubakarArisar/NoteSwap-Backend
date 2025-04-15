@@ -102,6 +102,24 @@ const getAllNotes = catchAsyncError(async (req, res) => {
   }
 });
 
+const downloadNote = catchAsyncError(async (req, res) => {
+  const noteId = req.params.id;
+  const searchedNote = await notesSchema.findById(noteId);
+  if (!searchedNote) {
+    res.status(404).json({
+      success: false,
+      message: "Note not found",
+    });
+    return;
+  }
+  const fileUrl = searchedNote.fileURL;
+  res.status(200).json({
+    success: true,
+    message: "File URL fetched successfully",
+    data: fileUrl,
+  });
+});
+
 module.exports = {
   uploadNote,
   getNoteByID,

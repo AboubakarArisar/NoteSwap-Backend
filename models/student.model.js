@@ -22,6 +22,14 @@ const studentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    noOfUploads: {
+      type: Number,
+      default: 0,
+    },
+    noOfDownloads: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

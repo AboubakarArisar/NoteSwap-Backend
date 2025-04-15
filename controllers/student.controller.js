@@ -21,7 +21,7 @@ const signup = catchAsyncError(async (req, res, next) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    const existingStudent = studentSchema.findOne({ username: username });
+    const existingStudent = await studentSchema.findOne({ username: username });
     if (existingStudent) {
       res.status(401).json({
         success: false,
@@ -31,7 +31,7 @@ const signup = catchAsyncError(async (req, res, next) => {
       return existingStudent;
     }
 
-    const studentCreated = await PersonSchema.create({
+    const studentCreated = await studentSchema.create({
       email,
       hashedPassword,
       username,
@@ -56,7 +56,7 @@ const signup = catchAsyncError(async (req, res, next) => {
 const login = catchAsyncError(async (req, res) => {
   const { email, password } = req.body;
 
-  const student = studentSchema.find({ email: email });
+  const student = await studentSchema.findOne({ email });
   if (!student) {
     res.status(404).json({
       success: false,
@@ -77,7 +77,11 @@ const login = catchAsyncError(async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-    return jwtToken;
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token: jwtToken,
+    });
   } else {
     res.status(404).json({
       success: false,
